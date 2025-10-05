@@ -1,0 +1,36 @@
+/* Add these styles to your existing CSS file */
+
+.code-display {
+    background: #e8f4fd;
+    border: 1px solid #b6e0fe;
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.code-box {
+    background: var(--white);
+    border: 2px dashed var(--primary-blue);
+    border-radius: var(--radius);
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-blue);
+    margin: 0.5rem 0;
+    letter-spacing: 2px;
+}
+
+.verification-hint {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}

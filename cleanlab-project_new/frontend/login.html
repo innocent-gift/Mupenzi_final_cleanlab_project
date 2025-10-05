@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Clean LAB</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span>🧼 Clean LAB</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="services.html" class="nav-link">Services</a>
+                <a href="booking.html" class="nav-link">Book Now</a>
+                <a href="login.html" class="nav-link active">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Login</button>
+                    <button class="tab-btn" data-tab="register">Register</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <h2>Login to Your Account</h2>
+                    <div class="form-group">
+                        <label for="loginPhone">Phone Number *</label>
+                        <input type="tel" id="loginPhone" name="phoneNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password *</label>
+                        <input type="password" id="loginPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">Login</button>
+                </form>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form">
+                    <h2>Create New Account</h2>
+                    <div class="form-group">
+                        <label for="regPhone">Phone Number *</label>
+                        <input type="tel" id="regPhone" name="phoneNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="regFullName">Full Name *</label>
+                        <input type="text" id="regFullName" name="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password *</label>
+                        <input type="password" id="regPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large">Register</button>
+                </form>
+
+                <!-- Verification Form -->
+                <form id="verifyForm" class="auth-form">
+                    <h2>Verify Your Account</h2>
+                    <div class="form-group">
+                        <label for="verifyCode">Verification Code *</label>
+                        <input type="text" id="verifyCode" name="code" required placeholder="Enter the verification code">
+                    </div>
+                    
+                    <div id="codeDisplay" class="code-display">
+                        <p><strong>Your verification code:</strong></p>
+                        <div class="code-box">
+                            <span id="verificationCodeText">000000</span>
+                        </div>
+                        <p class="verification-hint">Enter this code in the field above</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large">Verify Account</button>
+                    <button type="button" id="resendCode" class="btn btn-secondary">Get New Code</button>
+                </form>
+
+                <div id="authResult" class="result-message"></div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>

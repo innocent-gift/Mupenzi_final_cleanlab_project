@@ -1,0 +1,23 @@
+{
+  "name": "cleanlab-project_new",
+  "version": "1.0.0",
+  "description": "Clean LAB Booking System",
+  "main": "backend/server.js",
+  "scripts": {
+    "dev": "cd backend && node server.js",
+    "start": "cd backend && node server.js",
+    "frontend": "cd frontend && python3 -m http.server 5500",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cleaning",
+    "booking",
+    "laundry"
+  ],
+  "author": "Clean LAB",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "helmet": "^8.1.0"
+  }
+}
