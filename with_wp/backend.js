@@ -34,7 +34,7 @@ db.getConnection((err, connection) => {
     console.log('   3. Does the database exist?');
     return;
   }
-  
+
   console.log('✅ Connected to MySQL database');
   connection.release();
   initializeDatabase();
@@ -102,11 +102,11 @@ function insertDefaultServices() {
   // Check if services exist first
   db.query('SELECT COUNT(*) as count FROM services', (err, results) => {
     if (err) return;
-    
+
     if (results[0].count === 0) {
       const insertQuery = 'INSERT INTO services (name, standard_price, express_price, category) VALUES ?';
       const values = services.map(s => [s.name, s.standard_price, s.express_price, s.category]);
-      
+
       db.query(insertQuery, [values], (err) => {
         if (err) console.error('Error inserting services:', err.message);
         else console.log('✅ Default services inserted');
@@ -120,12 +120,28 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ADD THIS MISSING ROUTE - Main API endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    message: '🚀 Clean LAB Rwanda API is running!',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      services: '/api/services',
+      bookings: '/api/bookings (POST)'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   db.query('SELECT 1', (err) => {
-    res.json({ 
+    res.json({
       status: err ? 'Database connection failed' : 'OK',
-      timestamp: new Date().toISOString()
+      database: err ? 'disconnected' : 'connected',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
     });
   });
 });
@@ -135,30 +151,30 @@ app.post('/api/bookings', (req, res) => {
   const { name, contact, service_type, date_time, address, notes } = req.body;
 
   if (!name || !contact || !service_type || !date_time || !address) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'All fields are required' 
+    return res.status(400).json({
+      success: false,
+      message: 'All fields are required'
     });
   }
 
   const query = `
-    INSERT INTO bookings (name, contact, service_type, date_time, address, notes) 
+    INSERT INTO bookings (name, contact, service_type, date_time, address, notes)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
   db.query(query, [name, contact, service_type, date_time, address, notes || ''], (err, results) => {
     if (err) {
       console.error('Booking error:', err);
-      return res.status(500).json({ 
-        success: false, 
-        message: 'Failed to save booking' 
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to save booking'
       });
     }
 
     console.log(`New booking from: ${name}`);
-    res.json({ 
-      success: true, 
-      message: 'Booking received! We will contact you within 2 hours.' 
+    res.json({
+      success: true,
+      message: 'Booking received! We will contact you within 2 hours.'
     });
   });
 });
@@ -178,4 +194,6 @@ app.get('/api/services', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📊 API: http://localhost:${PORT}/api`);
+  console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
+  console.log(`🛠️ Services: http://localhost:${PORT}/api/services`);
 });
