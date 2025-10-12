@@ -1,15 +1,30 @@
 {
   "name": "with_wp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Clean LAB Rwanda - Laundry Service App",
+  "main": "backend/backend.js",
   "scripts": {
-    "start": "node backend/backend.js"
+    "start": "node backend/backend.js",
+    "dev": "node backend/backend.js",
+    "build": "echo 'No build step required'"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "laundry",
+    "cleaning",
+    "rwanda",
+    "service"
+  ],
+  "author": "Your Name",
   "license": "ISC",
   "dependencies": {
-    "express-session": "^1.18.2"
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "mysql2": "^3.15.2",
+    "path": "^0.12.7"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
