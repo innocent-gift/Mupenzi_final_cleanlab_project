@@ -11,18 +11,24 @@ const PORT = process.env.PORT || 8081;
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend folder
+// ✅ Serve frontend folder - FIXED PATH
 app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Database configuration
+// Database configuration - UPDATED FOR CLOUD DATABASE
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'cleanlab_rwanda'
+  database: process.env.DB_NAME || 'cleanlab_rwanda',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 };
 
-console.log('Database config:', { ...dbConfig, password: '***' });
+console.log('Database config:', { 
+  host: dbConfig.host,
+  user: dbConfig.user,
+  database: dbConfig.database,
+  ssl: dbConfig.ssl ? 'enabled' : 'disabled'
+});
 
 const db = mysql.createPool(dbConfig);
 
@@ -214,21 +220,19 @@ const requireAdminAuth = (req, res, next) => {
 };
 
 // ====================
-// ROUTES - UPDATED TO MATCH FRONTEND
+// ROUTES - FIXED PATHS
 // ====================
 
-// Admin routes
+// Admin routes - FIXED PATHS
 app.get('/admin', requireAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/admin.html'));
+  res.sendFile(path.join(__dirname, 'frontend/admin.html'));
 });
 
 app.get('/admin/logout', (req, res) => {
   res.redirect('/admin?logout=true');
 });
 
-// 🔥 FIXED ADMIN API ROUTES - MATCHING FRONTEND EXPECTATIONS
-
-// Get all bookings
+// Admin API routes
 app.get('/api/admin/bookings', requireAdminAuth, (req, res) => {
   const query = `
     SELECT * FROM bookings
@@ -246,7 +250,6 @@ app.get('/api/admin/bookings', requireAdminAuth, (req, res) => {
   });
 });
 
-// Get services
 app.get('/api/admin/services', requireAdminAuth, (req, res) => {
   const query = 'SELECT * FROM services ORDER BY category, name';
 
@@ -259,7 +262,6 @@ app.get('/api/admin/services', requireAdminAuth, (req, res) => {
   });
 });
 
-// 🔥 FIXED STATS ENDPOINT - MATCHES FRONTEND FIELD NAMES
 app.get('/api/admin/stats', requireAdminAuth, (req, res) => {
   const statsQuery = `
     SELECT
@@ -282,7 +284,6 @@ app.get('/api/admin/stats', requireAdminAuth, (req, res) => {
   });
 });
 
-// 🔥 FIXED STATUS UPDATE ENDPOINT - MATCHES FRONTEND URL
 app.put('/api/admin/bookings/:id/status', requireAdminAuth, (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -309,7 +310,6 @@ app.put('/api/admin/bookings/:id/status', requireAdminAuth, (req, res) => {
   });
 });
 
-// Delete booking - KEEP THIS AS IS (it matches frontend)
 app.delete('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
   const { id } = req.params;
 
@@ -330,9 +330,9 @@ app.delete('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
   });
 });
 
-// Frontend routes
+// Frontend routes - FIXED PATHS
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+  res.sendFile(path.join(__dirname, 'frontend/index.html'));
 });
 
 // API routes
@@ -400,7 +400,7 @@ app.get('/api/services', (req, res) => {
 });
 
 // ====================
-// START SERVER - UPDATED FOR VERCEL
+// START SERVER
 // ====================
 
 // Start server if not in Vercel environment
