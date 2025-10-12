@@ -214,7 +214,7 @@ const requireAdminAuth = (req, res, next) => {
 };
 
 // ====================
-// ROUTES
+// ROUTES - UPDATED TO MATCH FRONTEND
 // ====================
 
 // Admin routes
@@ -226,7 +226,9 @@ app.get('/admin/logout', (req, res) => {
   res.redirect('/admin?logout=true');
 });
 
-// 🔥 NEW ADMIN API ROUTES - THESE ARE WHAT YOUR ADMIN PAGE NEEDS
+// 🔥 FIXED ADMIN API ROUTES - MATCHING FRONTEND EXPECTATIONS
+
+// Get all bookings
 app.get('/api/admin/bookings', requireAdminAuth, (req, res) => {
   const query = `
     SELECT * FROM bookings 
@@ -238,10 +240,13 @@ app.get('/api/admin/bookings', requireAdminAuth, (req, res) => {
       console.error('Admin bookings error:', err);
       return res.status(500).json({ error: 'Failed to fetch bookings' });
     }
+    
+    console.log(`📋 Bookings fetched: ${results.length} records`);
     res.json(results);
   });
 });
 
+// Get services
 app.get('/api/admin/services', requireAdminAuth, (req, res) => {
   const query = 'SELECT * FROM services ORDER BY category, name';
   
@@ -254,13 +259,15 @@ app.get('/api/admin/services', requireAdminAuth, (req, res) => {
   });
 });
 
+// 🔥 FIXED STATS ENDPOINT - MATCHES FRONTEND FIELD NAMES
 app.get('/api/admin/stats', requireAdminAuth, (req, res) => {
   const statsQuery = `
     SELECT 
-      (SELECT COUNT(*) FROM bookings) as total_bookings,
-      (SELECT COUNT(*) FROM bookings WHERE status = 'pending') as pending_bookings,
-      (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed') as confirmed_bookings,
-      (SELECT COUNT(*) FROM bookings WHERE status = 'completed') as completed_bookings,
+      (SELECT COUNT(*) FROM bookings) as total,
+      (SELECT COUNT(*) FROM bookings WHERE status = 'pending') as pending,
+      (SELECT COUNT(*) FROM bookings WHERE status = 'confirmed') as confirmed,
+      (SELECT COUNT(*) FROM bookings WHERE status = 'completed') as completed,
+      (SELECT COUNT(*) FROM bookings WHERE DATE(created_at) = CURDATE()) as today,
       (SELECT COUNT(*) FROM services) as total_services
   `;
   
@@ -269,12 +276,14 @@ app.get('/api/admin/stats', requireAdminAuth, (req, res) => {
       console.error('Admin stats error:', err);
       return res.status(500).json({ error: 'Failed to fetch stats' });
     }
+    
+    console.log('📊 Stats data:', results[0]);
     res.json(results[0]);
   });
 });
 
-// Update booking status
-app.put('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
+// 🔥 FIXED STATUS UPDATE ENDPOINT - MATCHES FRONTEND URL
+app.put('/api/admin/bookings/:id/status', requireAdminAuth, (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   
@@ -287,19 +296,20 @@ app.put('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
   
   db.query(query, [status, id], (err, results) => {
     if (err) {
-      console.error('Update booking error:', err);
-      return res.status(500).json({ error: 'Failed to update booking' });
+      console.error('Update booking status error:', err);
+      return res.status(500).json({ error: 'Failed to update booking status' });
     }
     
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Booking not found' });
     }
     
-    res.json({ success: true, message: 'Booking updated successfully' });
+    console.log(`✅ Booking ${id} status updated to: ${status}`);
+    res.json({ success: true, message: `Booking status updated to ${status}` });
   });
 });
 
-// Delete booking
+// Delete booking - KEEP THIS AS IS (it matches frontend)
 app.delete('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
   const { id } = req.params;
   
@@ -315,6 +325,7 @@ app.delete('/api/admin/bookings/:id', requireAdminAuth, (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
     
+    console.log(`🗑️ Booking ${id} deleted`);
     res.json({ success: true, message: 'Booking deleted successfully' });
   });
 });
@@ -337,7 +348,8 @@ app.get('/api', (req, res) => {
       admin_api: {
         bookings: '/api/admin/bookings',
         services: '/api/admin/services', 
-        stats: '/api/admin/stats'
+        stats: '/api/admin/stats',
+        update_status: '/api/admin/bookings/:id/status (PUT)'
       }
     },
     timestamp: new Date().toISOString()
@@ -398,5 +410,6 @@ app.listen(PORT, () => {
   console.log(`👨‍💼 Admin Dashboard: http://localhost:${PORT}/admin`);
   console.log(`📋 Admin API: http://localhost:${PORT}/api/admin/bookings`);
   console.log(`📈 Admin Stats: http://localhost:${PORT}/api/admin/stats`);
+  console.log(`🔄 Status Updates: http://localhost:${PORT}/api/admin/bookings/:id/status`);
   console.log(`🔐 Admin Password: Set in .env as ADMIN_PASSWORD`);
 });
